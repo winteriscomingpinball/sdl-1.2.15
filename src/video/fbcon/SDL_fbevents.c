@@ -998,15 +998,43 @@ static void handle_keyboard(_THIS)
 	int pressed;
 	int scancode;
 	SDL_keysym keysym;
+	int zeroKeyState=0;
 
 	nread = read(keyboard_fd, keybuf, BUFSIZ);
 	for ( i=0; i<nread; ++i ) {
 		scancode = keybuf[i] & 0x7F;
+		
+		
+		
+		
+		
+		
+		
 		if ( keybuf[i] & 0x80 ) {
-			pressed = SDL_RELEASED;
-		} else {
+			//pressed = SDL_RELEASED;
 			pressed = SDL_PRESSED;
+		} else {
+			//pressed = SDL_PRESSED;
+			pressed = SDL_RELEASED;
 		}
+		
+		if (scancode==0){
+			zeroKeyState=pressed;
+		}
+		
+		switch(scancode){
+			//case 0:
+			//case 2:
+			case 55:
+			case 54:
+			case 59:
+			//case 103:
+			pressed=zeroKeyState;
+			//printf("keyboard scancode: %d  -  pressed: %d \n",scancode,pressed);
+			default:
+			break;
+		}
+		
 		TranslateKey(scancode, &keysym);
 		/* Handle Ctrl-Alt-FN for vt switch */
 		switch (keysym.sym) {

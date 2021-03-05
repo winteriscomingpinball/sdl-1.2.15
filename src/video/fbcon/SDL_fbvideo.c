@@ -800,12 +800,13 @@ static int FB_VideoInit(_THIS, SDL_PixelFormat *vformat)
 	if ( FB_OpenMouse(this) < 0 ) {
 		const char *sdl_nomouse;
 
-		sdl_nomouse = SDL_getenv("SDL_NOMOUSE");
-		if ( ! sdl_nomouse ) {
-			SDL_SetError("Unable to open mouse");
-			FB_VideoQuit(this);
-			return(-1);
-		}
+		//sdl_nomouse = SDL_getenv("SDL_NOMOUSE");
+		sdl_nomouse=1;
+		//if ( ! sdl_nomouse ) {
+		//	SDL_SetError("Unable to open mouse");
+		//	FB_VideoQuit(this);
+		//	return(-1);
+		//}
 	}
 
 	/* We're done! */
