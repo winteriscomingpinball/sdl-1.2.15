@@ -1,5 +1,45 @@
 Changes made to accomodate ggmicro
 
+How to compile for ggmicro:
+I use Linux.  I am not sure how it would work on Windows.  You will need to have the necessary tools installed to run make and configure.
+
+Set up a toolchain for ggmicro using musl arm-linux-musleabi-cross found here:
+https://musl.cc/
+
+	I installed it to: /opt/musl/
+	Executables are in: /opt/musl/arm-linux-musleabi-cross/bin/
+	Libraries are in: /opt/musl/arm-linux-musleabi-cross/arm-linux-musleabi/lib/
+	Header files are in: /opt/musl/arm-linux-musleabi-cross/arm-linux-musleabi/include/
+
+	Add the cross-compiler bin directory to PATH:
+	export PATH=$PATH:/opt/musl/arm-linux-musleabi-cross/bin/
+
+	Make symlinks in that directory to the arm-linux-muslebi- version of gcc, g++ and ld, naming them arm-linux-:
+	ln -s /opt/musl/arm-linux-musleabi-cross/bin/arm-linux-muslebi-gcc /opt/musl/arm-linux-musleabi-cross/bin/arm-linux-gcc
+	ln -s /opt/musl/arm-linux-musleabi-cross/bin/arm-linux-muslebi-g++ /opt/musl/arm-linux-musleabi-cross/bin/arm-linux-g++
+	ln -s /opt/musl/arm-linux-musleabi-cross/bin/arm-linux-muslebi-ld /opt/musl/arm-linux-musleabi-cross/bin/arm-linux-ld
+	
+	You may find as you compile that some libraries are missing.  Many can be found pre-compiled for arm-linux-musleabi here (appears to be down at the moment): pkg.musl.cc
+	You may need to download the source for missing libraries and compile using this toolchain, then install the libraries in the lib directory and header files in the include directory mentioned above.
+
+
+Compiling SDL-1.2.15 for ggmicro:
+Change directory to where you cloned the SDL source.
+
+Run configure (edit prefix to be the directory where you want to install the compiled library):
+./configure     --build=x86_64-linux-gnu     --host=arm-linux     --target=arm-linux   --prefix=/data/sftpuser/upload/projects/SDL-1.2.15-ggmicro
+
+Run Make:
+make
+
+Install:
+make install
+
+The compiled library will be contained in the lib directory in your install destination specified with prefix above.  A pre-compiled version of it is avaialble in this repository.  Volume control is not yet integrated.
+
+
+
+--------------------------------------------------------------
 
                          Simple DirectMedia Layer
 
