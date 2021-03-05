@@ -338,13 +338,14 @@ static void APPLY_VOLUME(){
 	int counter;
 	int16_t *sample_buf = (const Uint8 *) mixbuf;
 	int16_t *dst= = (const Uint8 *) volbuf;
-	UINT32 readVol;
+	UINT32_C readVol;
 	unsigned vol;
+	int temp;
 	
 
     readVol=(4090-read_value_from_fd(fd_vol, 0))*16;
 	
-	//vol=readVol>>1;
+	vol=readVol>>1;
 	 
 	if (readVol&0x01)
 	{
