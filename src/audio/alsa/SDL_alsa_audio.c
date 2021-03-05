@@ -334,16 +334,33 @@ static __inline__ void swizzle_alsa_channels(_THIS)
 }
 
 
-static void APPLY_VOLUME(_THIS){
-	int counter;
-	const Uint8 *src = (const Uint8 *) volbuf;
+
+
+
+static void ALSA_PlayAudio(_THIS)
+{
+	int status;
+	snd_pcm_uframes_t frames_left;
+	const Uint8 *src_buf = (const Uint8 *) mixbuf;
+	const Uint8 *sample_buf = (const Uint8 *) volbuf;
+	const int frame_size = (((int) (this->spec.format & 0xFF)) / 8) * this->spec.channels;
+    const Uint8 *src = (const Uint8 *) volbuf;
 	Uint8 *dst = (Uint8 *) volbuf;
 	uint32_t readVol;
 	unsigned vol;
 	int temp;
-	snd_pcm_uframes_t frames_left;
 	
+	
+	swizzle_alsa_channels(this);
+
 	frames_left = ((snd_pcm_uframes_t) this->spec.samples);
+
+	while ( frames_left > 0 && this->enabled ) {
+		/* This works, but needs more testing before going live */
+		/*SDL_NAME(snd_pcm_wait)(pcm_handle, -1);*/
+		
+		
+	
 
     readVol=(4090-read_value_from_fd(fd_vol, 0))*16;
 	
@@ -367,29 +384,6 @@ static void APPLY_VOLUME(_THIS){
 			*dst++=(*src++)>>vol;
 		}
 	}
-
-}
-
-
-static void ALSA_PlayAudio(_THIS)
-{
-	int status;
-	snd_pcm_uframes_t frames_left;
-	//const Uint8 *sample_buf = (const Uint8 *) mixbuf;
-	const Uint8 *sample_buf = (const Uint8 *) volbuf;
-	const int frame_size = (((int) (this->spec.format & 0xFF)) / 8) * this->spec.channels;
-    
-	
-	
-	swizzle_alsa_channels(this);
-
-	frames_left = ((snd_pcm_uframes_t) this->spec.samples);
-
-	while ( frames_left > 0 && this->enabled ) {
-		/* This works, but needs more testing before going live */
-		/*SDL_NAME(snd_pcm_wait)(pcm_handle, -1);*/
-		
-		APPLY_VOLUME(_THIS);
 		
 
 		status = SDL_NAME(snd_pcm_writei)(pcm_handle, sample_buf, frames_left);
