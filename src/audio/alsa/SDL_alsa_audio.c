@@ -368,24 +368,29 @@ static void ALSA_PlayAudio(_THIS)
 	//vol=readVol>>3;
 	 vol=0;
 
-	if (readVol&0x01)
-	{
-		vol++;
-		//for odd volume step - add back in half as much again!
-		for(counter=frames_left;counter;counter--)
-		{
-			temp=(*src++)>>vol;
-			*dst++=temp+(temp>>1);
-		}
-	}
-	else
-	{
-		//For even volume step - same as normal shift
-		for(counter=frames_left;counter;counter--)
-		{
-			*dst++=(*src++)>>vol;
-		}
-	}
+	// if (readVol&0x01)
+	// {
+		// vol++;
+		// //for odd volume step - add back in half as much again!
+		// for(counter=frames_left;counter;counter--)
+		// {
+			// temp=(*src++)>>vol;
+			// *dst++=temp+(temp>>1);
+		// }
+	// }
+	// else
+	// {
+		// //For even volume step - same as normal shift
+		// for(counter=frames_left;counter;counter--)
+		// {
+			// *dst++=(*src++)>>vol;
+		// }
+	// }
+	
+	for(counter=frames_left;counter;counter--)
+		 {
+			 dst++=(src++);
+	     }
 		
 
 		status = SDL_NAME(snd_pcm_writei)(pcm_handle, sample_buf, frames_left);
