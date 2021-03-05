@@ -346,7 +346,7 @@ static void ALSA_PlayAudio(_THIS)
 	const int frame_size = (((int) (this->spec.format & 0xFF)) / 8) * this->spec.channels;
     const Uint8 *src = (const Uint8 *) mixbuf;
 	Uint8 *dst = (Uint8 *) volbuf;
-	uint32_t readVol;
+	float readVol;
 	unsigned vol;
 	int temp;
 	int counter;
@@ -387,9 +387,11 @@ static void ALSA_PlayAudio(_THIS)
 		// }
 	// }
 	
+	
+	
 	for(counter=frames_left;counter;counter--)
 		 {
-			 sample_buf[counter]=sample_buf[counter]*readVol;
+			 sample_buf[counter]-=sample_buf[counter]* percent);
 	    }
 		
 
