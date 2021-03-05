@@ -349,6 +349,7 @@ static void ALSA_PlayAudio(_THIS)
 	uint32_t readVol;
 	unsigned vol;
 	int temp;
+	int counter;
 	
 	
 	swizzle_alsa_channels(this);
