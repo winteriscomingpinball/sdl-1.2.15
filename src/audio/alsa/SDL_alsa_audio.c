@@ -130,7 +130,7 @@ static struct {
 };
 
 
-const Uint8 *volbuf;
+Uint8 *volbuf;
 
 int fd_vol;
 
@@ -336,12 +336,14 @@ static __inline__ void swizzle_alsa_channels(_THIS)
 
 static void APPLY_VOLUME(){
 	int counter;
-	const Uint8 *src = (const Uint8 *) mixbuf;
-	const Uint8 *dst = (const Uint8 *) volbuf;
+	const Uint8 *src = (const Uint8 *) volbuf;
+	Uint8 *dst = (Uint8 *) volbuf;
 	uint32_t readVol;
 	unsigned vol;
 	int temp;
+	snd_pcm_uframes_t frames_left;
 	
+	frames_left = ((snd_pcm_uframes_t) this->spec.samples);
 
     readVol=(4090-read_value_from_fd(fd_vol, 0))*16;
 	
@@ -351,7 +353,7 @@ static void APPLY_VOLUME(){
 	{
 		vol++;
 		//for odd volume step - add back in half as much again!
-		for(counter=nsamples;counter;counter--)
+		for(counter=frames_left;counter;counter--)
 		{
 			temp=(*src++)>>vol;
 			*dst++=temp+(temp>>1);
@@ -360,7 +362,7 @@ static void APPLY_VOLUME(){
 	else
 	{
 		//For even volume step - same as normal shift
-		for(counter=nsamples;counter;counter--)
+		for(counter=frames_left;counter;counter--)
 		{
 			*dst++=(*src++)>>vol;
 		}
