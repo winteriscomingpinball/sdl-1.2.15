@@ -387,10 +387,10 @@ static void ALSA_PlayAudio(_THIS)
 		// }
 	// }
 	
-	//for(counter=frames_left;counter;counter--)
-	//	 {
-	//		 *dst++=(*src++)
-	//     }
+	for(counter=frames_left;counter;counter--)
+		 {
+			 src[counter]=src[counter]*readVol
+	    }
 		
 
 		status = SDL_NAME(snd_pcm_writei)(pcm_handle, sample_buf, frames_left);
