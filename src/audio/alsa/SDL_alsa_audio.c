@@ -365,8 +365,9 @@ static void ALSA_PlayAudio(_THIS)
 
     readVol=(4090-read_value_from_fd(fd_vol, 0))*16;
 	
-	vol=readVol>>3;
-	 
+	//vol=readVol>>3;
+	 vol=0;
+
 	if (readVol&0x01)
 	{
 		vol++;
