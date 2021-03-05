@@ -334,7 +334,7 @@ static __inline__ void swizzle_alsa_channels(_THIS)
 }
 
 
-static void APPLY_VOLUME(){
+static void APPLY_VOLUME(_THIS){
 	int counter;
 	const Uint8 *src = (const Uint8 *) volbuf;
 	Uint8 *dst = (Uint8 *) volbuf;
@@ -389,7 +389,7 @@ static void ALSA_PlayAudio(_THIS)
 		/* This works, but needs more testing before going live */
 		/*SDL_NAME(snd_pcm_wait)(pcm_handle, -1);*/
 		
-		APPLY_VOLUME();
+		APPLY_VOLUME(_THIS);
 		
 
 		status = SDL_NAME(snd_pcm_writei)(pcm_handle, sample_buf, frames_left);
