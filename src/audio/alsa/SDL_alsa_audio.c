@@ -345,7 +345,7 @@ static void ALSA_PlayAudio(_THIS)
 	const Uint8 *sample_buf = (const Uint8 *) volbuf;
 	const int frame_size = (((int) (this->spec.format & 0xFF)) / 8) * this->spec.channels;
     const Uint8 *src = (const Uint8 *) mixbuf;
-	const Uint8 *dst = (Uint8 *) volbuf;
+	Uint8 *dst = (Uint8 *) volbuf;
 	uint32_t readVol;
 	unsigned vol;
 	int temp;
