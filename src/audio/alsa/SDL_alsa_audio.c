@@ -25,6 +25,9 @@
 
 #include <sys/types.h>
 #include <signal.h>	/* For kill() */
+#include <fcntl.h>
+
+
 
 #include "SDL_timer.h"
 #include "SDL_audio.h"
@@ -125,6 +128,34 @@ static struct {
 	{ "snd_pcm_nonblock",	(void**)(char*)&SDL_NAME(snd_pcm_nonblock)	},
 	{ "snd_pcm_wait",	(void**)(char*)&SDL_NAME(snd_pcm_wait)	},
 };
+
+
+
+
+int fd_vol;
+
+int read_value_from_fd(int fd, int is_bool)
+{
+  int result; // r0
+  unsigned char buf[10]; // [sp+Ch] [bp-1Ch] BYREF
+
+  *(char *)&buf[4] = 0;
+  *(char *)&buf[8] = 0;
+  *(char *)buf = 0;
+  
+  //lseek(fd, is_bool, 0);
+  lseek(fd, 0, 0);
+  //puts ("reading value");
+  read(fd, buf, 10);
+  //printf("read_value_from_fd: reading value: %s.\n", buf);
+  
+  if ( is_bool )
+    result = buf[0] != 0x30;  //check that passed result is not ascii "0"
+  else
+    result = atoi((const char *)buf);
+  return result;
+}
+
 
 static void UnloadALSALibrary(void) {
 	if (alsa_loaded) {
@@ -303,13 +334,50 @@ static __inline__ void swizzle_alsa_channels(_THIS)
 }
 
 
+static void APPLY_VOLUME(){
+	int counter;
+	int16_t *sample_buf = (const Uint8 *) mixbuf;
+	int16_t *dst= = (const Uint8 *) volbuf;
+	UINT32 readVol;
+	unsigned vol;
+	
+
+    readVol=(4090-read_value_from_fd(fd_vol, 0))*16;
+	
+	//vol=readVol>>1;
+	 
+	if (readVol&0x01)
+	{
+		vol++;
+		//for odd volume step - add back in half as much again!
+		for(counter=nsamples;counter;counter--)
+		{
+			temp=(*src++)>>vol;
+			*dst++=temp+(temp>>1);
+		}
+	}
+	else
+	{
+		//For even volume step - same as normal shift
+		for(counter=nsamples;counter;counter--)
+		{
+			*dst++=(*src++)>>vol;
+		}
+	}
+
+}
+
+
 static void ALSA_PlayAudio(_THIS)
 {
 	int status;
 	snd_pcm_uframes_t frames_left;
-	const Uint8 *sample_buf = (const Uint8 *) mixbuf;
+	//const Uint8 *sample_buf = (const Uint8 *) mixbuf;
+	const Uint8 *sample_buf = (const Uint8 *) volbuf;
 	const int frame_size = (((int) (this->spec.format & 0xFF)) / 8) * this->spec.channels;
-
+    
+	
+	
 	swizzle_alsa_channels(this);
 
 	frames_left = ((snd_pcm_uframes_t) this->spec.samples);
@@ -317,6 +385,9 @@ static void ALSA_PlayAudio(_THIS)
 	while ( frames_left > 0 && this->enabled ) {
 		/* This works, but needs more testing before going live */
 		/*SDL_NAME(snd_pcm_wait)(pcm_handle, -1);*/
+		
+		APPLY_VOLUME();
+		
 
 		status = SDL_NAME(snd_pcm_writei)(pcm_handle, sample_buf, frames_left);
 		if ( status < 0 ) {
@@ -355,6 +426,8 @@ static void ALSA_CloseAudio(_THIS)
 		SDL_NAME(snd_pcm_close)(pcm_handle);
 		pcm_handle = NULL;
 	}
+	
+	close(fd_vol);
 }
 
 static int ALSA_finalize_hardware(_THIS, SDL_AudioSpec *spec, snd_pcm_hw_params_t *hwparams, int override)
@@ -469,6 +542,9 @@ static int ALSA_OpenAudio(_THIS, SDL_AudioSpec *spec)
 	unsigned int         rate;
 	unsigned int 	     channels;
 	Uint16               test_format;
+	
+	//for volume wheel val
+	fd_vol = open("/sys/devices/soc/1c24800.tp_adc/value", 0);
 
 	/* Open the audio device */
 	/* Name of device should depend on # channels in spec */
@@ -605,6 +681,7 @@ static int ALSA_OpenAudio(_THIS, SDL_AudioSpec *spec)
 	/* Allocate mixing buffer */
 	mixlen = spec->size;
 	mixbuf = (Uint8 *)SDL_AllocAudioMem(mixlen);
+	volbuf = (Uint8 *)SDL_AllocAudioMem(mixlen);
 	if ( mixbuf == NULL ) {
 		ALSA_CloseAudio(this);
 		return(-1);

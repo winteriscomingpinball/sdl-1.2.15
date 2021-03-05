@@ -37,6 +37,7 @@ struct SDL_PrivateAudioData {
 
 	/* Raw mixing buffer */
 	Uint8 *mixbuf;
+	Uint8 *volbuf;
 	int    mixlen;
 };
 
