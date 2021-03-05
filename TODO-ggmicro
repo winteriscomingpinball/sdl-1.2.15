@@ -1,0 +1,2 @@
+-Add volume control into SDL - need to read value of volume wheel and apply directly to pcm data before it is written
+-Build in audio initialization steps that enable audio on ggmicro so that any SDL program will automatically have sound available.
