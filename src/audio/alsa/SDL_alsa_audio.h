@@ -31,13 +31,13 @@
 /* Hidden "this" pointer for the video functions */
 #define _THIS	SDL_AudioDevice *this
 
+
 struct SDL_PrivateAudioData {
 	/* The audio device handle */
 	snd_pcm_t *pcm_handle;
 
 	/* Raw mixing buffer */
 	Uint8 *mixbuf;
-	Uint8 *volbuf;
 	int    mixlen;
 };
 

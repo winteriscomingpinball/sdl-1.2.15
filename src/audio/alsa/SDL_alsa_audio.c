@@ -130,7 +130,7 @@ static struct {
 };
 
 
-
+Uint8 *volbuf;
 
 int fd_vol;
 
