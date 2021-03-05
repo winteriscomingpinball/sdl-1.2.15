@@ -389,7 +389,7 @@ static void ALSA_PlayAudio(_THIS)
 	
 	for(counter=frames_left;counter;counter--)
 		 {
-			 dst++=(src++);
+			 dst[counter]=src[counter];
 	     }
 		
 
