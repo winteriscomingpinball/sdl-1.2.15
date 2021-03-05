@@ -336,9 +336,9 @@ static __inline__ void swizzle_alsa_channels(_THIS)
 
 static void APPLY_VOLUME(){
 	int counter;
-	int16_t *sample_buf = (const Uint8 *) mixbuf;
-	int16_t *dst= = (const Uint8 *) volbuf;
-	UINT32_C readVol;
+	int8_t *sample_buf = (const Uint8 *) mixbuf;
+	int8_t *dst= = (const Uint8 *) volbuf;
+	uint32_t readVol;
 	unsigned vol;
 	int temp;
 	
