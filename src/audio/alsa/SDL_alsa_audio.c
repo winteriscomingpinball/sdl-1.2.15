@@ -364,7 +364,10 @@ static void ALSA_PlayAudio(_THIS)
 	
 
     //readVol=(4090-read_value_from_fd(fd_vol, 0))*16;
-	readVol=read_value_from_fd(fd_vol, 0)*0.015;
+	readVol=(4090-read_value_from_fd(fd_vol, 0)/4090
+	//readVol=read_value_from_fd(fd_vol, 0)*0.015;
+	//readVol=read_value_from_fd(fd_vol, 0)/4090
+	
 	//vol=readVol>>3;
 	 vol=0;
 
@@ -391,7 +394,7 @@ static void ALSA_PlayAudio(_THIS)
 	
 	for(counter=frames_left;counter;counter--)
 		 {
-			 sample_buf[counter]-=sample_buf[counter]* percent);
+			 sample_buf[counter]-=sample_buf[counter]* readVol);
 	    }
 		
 
