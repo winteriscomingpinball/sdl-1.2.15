@@ -392,7 +392,7 @@ static void ALSA_PlayAudio(_THIS)
 		// }
 	// }
 	
-	SDL_memset(sample_buf, 0, spec->size);
+	SDL_memset(sample_buf, 0, this->spec->size);
 	
 	SDL_MixAudio (sample_buf, src_buf, (Uint32)frames_left, readVol);
 	
