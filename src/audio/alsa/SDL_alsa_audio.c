@@ -342,15 +342,15 @@ static void ALSA_PlayAudio(_THIS)
 {
 	int status;
 	snd_pcm_uframes_t frames_left;
-	const Uint8 *src_buf = (const Uint8 *) mixbuf;
-	Uint8 *sample_buf = (const Uint8 *) volbuf;
+	//const Uint8 *src_buf = (const Uint8 *) mixbuf;
+	Uint8 *sample_buf = (const Uint8 *) mixbuf;
 	const int frame_size = (((int) (this->spec.format & 0xFF)) / 8) * this->spec.channels;
-    const Uint8 *src = (const Uint8 *) mixbuf;
-	Uint8 *dst = (Uint8 *) volbuf;
-	int readVol;
-	unsigned vol;
-	int temp;
-	int counter;
+    //const Uint8 *src = (const Uint8 *) mixbuf;
+	//Uint8 *dst = (Uint8 *) volbuf;
+	//int readVol;
+	//unsigned vol;
+	//nt temp;
+	//int counter;
 	
 	
 	swizzle_alsa_channels(this);
@@ -365,7 +365,7 @@ static void ALSA_PlayAudio(_THIS)
 	
 
     //readVol=(4090-read_value_from_fd(fd_vol, 0))*16;
-	readVol=((4090-read_value_from_fd(fd_vol, 0))*128)/4090;
+	//readVol=((4090-read_value_from_fd(fd_vol, 0))*128)/4090;
 	
 	//readVol=read_value_from_fd(fd_vol, 0)*0.015;
 	//readVol=read_value_from_fd(fd_vol, 0)/4090
@@ -392,9 +392,9 @@ static void ALSA_PlayAudio(_THIS)
 		// }
 	// }
 	
-	SDL_memset(sample_buf, 0, this->spec.size);
+	//SDL_memset(sample_buf, 0, this->spec.size);
 	
-	SDL_MixAudio (sample_buf, src_buf, this->spec.size, readVol);
+	//SDL_MixAudio (sample_buf, src_buf, this->spec.size, readVol);
 	
 	//for(counter=frames_left;counter;counter--)
 	//	 {
