@@ -34,7 +34,7 @@
 #include "../SDL_audiomem.h"
 #include "../SDL_audio_c.h"
 #include "SDL_alsa_audio.h"
-#include "../SDL_mixer.c"
+//#include "../SDL_mixer.c"
 
 #ifdef SDL_AUDIO_DRIVER_ALSA_DYNAMIC
 #include "SDL_name.h"
