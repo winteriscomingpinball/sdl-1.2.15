@@ -1,17 +1,21 @@
 /*
     SDL - Simple DirectMedia Layer
     Copyright (C) 1997-2012 Sam Lantinga
+
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
     License as published by the Free Software Foundation; either
     version 2 of the License, or (at your option) any later version.
+
     This library is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
     Library General Public License for more details.
+
     You should have received a copy of the GNU Library General Public
     License along with this library; if not, write to the Free
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
     Sam Lantinga
     slouken@libsdl.org
 */
@@ -21,12 +25,16 @@
 
 #include <sys/types.h>
 #include <signal.h>	/* For kill() */
+#include <fcntl.h>
+
+
 
 #include "SDL_timer.h"
 #include "SDL_audio.h"
 #include "../SDL_audiomem.h"
 #include "../SDL_audio_c.h"
 #include "SDL_alsa_audio.h"
+//#include "../SDL_mixer.c"
 
 #ifdef SDL_AUDIO_DRIVER_ALSA_DYNAMIC
 #include "SDL_name.h"
@@ -121,6 +129,34 @@ static struct {
 	{ "snd_pcm_nonblock",	(void**)(char*)&SDL_NAME(snd_pcm_nonblock)	},
 	{ "snd_pcm_wait",	(void**)(char*)&SDL_NAME(snd_pcm_wait)	},
 };
+
+
+//Uint8 *volbuf;
+
+int fd_vol;
+
+int read_value_from_fd(int fd, int is_bool)
+{
+  int result; // r0
+  unsigned char buf[10]; // [sp+Ch] [bp-1Ch] BYREF
+
+  *(char *)&buf[4] = 0;
+  *(char *)&buf[8] = 0;
+  *(char *)buf = 0;
+  
+  //lseek(fd, is_bool, 0);
+  lseek(fd, 0, 0);
+  //puts ("reading value");
+  read(fd, buf, 10);
+  //printf("read_value_from_fd: reading value: %s.\n", buf);
+  
+  if ( is_bool )
+    result = buf[0] != 0x30;  //check that passed result is not ascii "0"
+  else
+    result = atoi((const char *)buf);
+  return result;
+}
+
 
 static void UnloadALSALibrary(void) {
 	if (alsa_loaded) {
@@ -299,13 +335,24 @@ static __inline__ void swizzle_alsa_channels(_THIS)
 }
 
 
+
+
+
 static void ALSA_PlayAudio(_THIS)
 {
 	int status;
 	snd_pcm_uframes_t frames_left;
-	const Uint8 *sample_buf = (const Uint8 *) mixbuf;
+	const Uint8 *src_buf = (const Uint8 *) mixbuf;
+	Uint8 *sample_buf = (const Uint8 *) volbuf;
 	const int frame_size = (((int) (this->spec.format & 0xFF)) / 8) * this->spec.channels;
-
+    const Uint8 *src = (const Uint8 *) mixbuf;
+	Uint8 *dst = (Uint8 *) volbuf;
+	int readVol;
+	unsigned vol;
+	int temp;
+	int counter;
+	
+	
 	swizzle_alsa_channels(this);
 
 	frames_left = ((snd_pcm_uframes_t) this->spec.samples);
@@ -313,6 +360,48 @@ static void ALSA_PlayAudio(_THIS)
 	while ( frames_left > 0 && this->enabled ) {
 		/* This works, but needs more testing before going live */
 		/*SDL_NAME(snd_pcm_wait)(pcm_handle, -1);*/
+		
+		
+	
+
+    //readVol=(4090-read_value_from_fd(fd_vol, 0))*16;
+	readVol=((4090-read_value_from_fd(fd_vol, 0))*128)/4090;
+	
+	//readVol=read_value_from_fd(fd_vol, 0)*0.015;
+	//readVol=read_value_from_fd(fd_vol, 0)/4090
+	
+	//vol=readVol>>3;
+	 //vol=0;
+
+	// if (readVol&0x01)
+	// {
+		// vol++;
+		// //for odd volume step - add back in half as much again!
+		// for(counter=frames_left;counter;counter--)
+		// {
+			// temp=(*src++)>>vol;
+			// *dst++=temp+(temp>>1);
+		// }
+	// }
+	// else
+	// {
+		// //For even volume step - same as normal shift
+		// for(counter=frames_left;counter;counter--)
+		// {
+			// *dst++=(*src++)>>vol;
+		// }
+	// }
+	
+	SDL_memset(sample_buf, 0, this->spec.size);
+	
+	SDL_MixAudio (sample_buf, src_buf, this->spec.size, readVol);
+	
+	//for(counter=frames_left;counter;counter--)
+	//	 {
+	//		 sample_buf[counter]-=sample_buf[counter]* readVol;
+	//		 sample_buf[counter]-=sample_buf[counter];//* readVol;
+	 //   }
+		
 
 		status = SDL_NAME(snd_pcm_writei)(pcm_handle, sample_buf, frames_left);
 		if ( status < 0 ) {
@@ -351,6 +440,8 @@ static void ALSA_CloseAudio(_THIS)
 		SDL_NAME(snd_pcm_close)(pcm_handle);
 		pcm_handle = NULL;
 	}
+	
+	close(fd_vol);
 }
 
 static int ALSA_finalize_hardware(_THIS, SDL_AudioSpec *spec, snd_pcm_hw_params_t *hwparams, int override)
@@ -465,6 +556,9 @@ static int ALSA_OpenAudio(_THIS, SDL_AudioSpec *spec)
 	unsigned int         rate;
 	unsigned int 	     channels;
 	Uint16               test_format;
+	
+	//for volume wheel val
+	fd_vol = open("/sys/devices/soc/1c24800.tp_adc/value", 0);
 
 	/* Open the audio device */
 	/* Name of device should depend on # channels in spec */
@@ -601,6 +695,7 @@ static int ALSA_OpenAudio(_THIS, SDL_AudioSpec *spec)
 	/* Allocate mixing buffer */
 	mixlen = spec->size;
 	mixbuf = (Uint8 *)SDL_AllocAudioMem(mixlen);
+	volbuf = (Uint8 *)SDL_AllocAudioMem(mixlen);
 	if ( mixbuf == NULL ) {
 		ALSA_CloseAudio(this);
 		return(-1);
