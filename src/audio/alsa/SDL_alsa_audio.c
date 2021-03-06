@@ -34,6 +34,7 @@
 #include "../SDL_audiomem.h"
 #include "../SDL_audio_c.h"
 #include "SDL_alsa_audio.h"
+#include "../SDL_mixer.c"
 
 #ifdef SDL_AUDIO_DRIVER_ALSA_DYNAMIC
 #include "SDL_name.h"
@@ -342,11 +343,11 @@ static void ALSA_PlayAudio(_THIS)
 	int status;
 	snd_pcm_uframes_t frames_left;
 	const Uint8 *src_buf = (const Uint8 *) mixbuf;
-	Uint8 *sample_buf = (const Uint8 *) mixbuf;
+	Uint8 *sample_buf = (const Uint8 *) volbuf;
 	const int frame_size = (((int) (this->spec.format & 0xFF)) / 8) * this->spec.channels;
     const Uint8 *src = (const Uint8 *) mixbuf;
 	Uint8 *dst = (Uint8 *) volbuf;
-	float readVol;
+	int readVol;
 	unsigned vol;
 	int temp;
 	int counter;
@@ -364,12 +365,13 @@ static void ALSA_PlayAudio(_THIS)
 	
 
     //readVol=(4090-read_value_from_fd(fd_vol, 0))*16;
-	readVol=(4090-read_value_from_fd(fd_vol, 0))/4090;
+	readVol=((4090-read_value_from_fd(fd_vol, 0))*128)/4090;
+	
 	//readVol=read_value_from_fd(fd_vol, 0)*0.015;
 	//readVol=read_value_from_fd(fd_vol, 0)/4090
 	
 	//vol=readVol>>3;
-	 vol=0;
+	 //vol=0;
 
 	// if (readVol&0x01)
 	// {
@@ -391,12 +393,13 @@ static void ALSA_PlayAudio(_THIS)
 	// }
 	
 	
+	SDL_MixAudio (sample_buf, src_buf, (Uint32)frames_left, readVol);
 	
-	for(counter=frames_left;counter;counter--)
-		 {
-			 sample_buf[counter]-=sample_buf[counter]* readVol;
-			 sample_buf[counter]-=sample_buf[counter];//* readVol;
-	    }
+	//for(counter=frames_left;counter;counter--)
+	//	 {
+	//		 sample_buf[counter]-=sample_buf[counter]* readVol;
+	//		 sample_buf[counter]-=sample_buf[counter];//* readVol;
+	 //   }
 		
 
 		status = SDL_NAME(snd_pcm_writei)(pcm_handle, sample_buf, frames_left);
