@@ -343,7 +343,7 @@ static void ALSA_PlayAudio(_THIS)
 	int status;
 	snd_pcm_uframes_t frames_left;
 	const Uint8 *src_buf = (const Uint8 *) mixbuf;
-	Uint8 *sample_buf = (const Uint8 *) mixbuf;
+	Uint8 *sample_buf = (const Uint8 *) volbuf;
 	const int frame_size = (((int) (this->spec.format & 0xFF)) / 8) * this->spec.channels;
     const Uint8 *src = (const Uint8 *) mixbuf;
 	Uint8 *dst = (Uint8 *) volbuf;
@@ -392,6 +392,7 @@ static void ALSA_PlayAudio(_THIS)
 		// }
 	// }
 	
+	SDL_memset(sample_buf, 0, spec->size);
 	
 	SDL_MixAudio (sample_buf, src_buf, (Uint32)frames_left, readVol);
 	
