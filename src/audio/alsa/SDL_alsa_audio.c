@@ -374,13 +374,13 @@ static void ALSA_PlayAudio(_THIS)
 	//get value from volume wheel and convert to a value 0-63
 	volcheckcounter++;
 	if(volcheckcounter>=VOLCHECKCOUNT){	
-	readVol=read_value_from_fd(fd_vol, 0);
-	if (readVol>4090){
-		readVol=4090;
-	}
-	
-	readVol=(4090-readVol*63)/4090;
-	volcheckcounter=0;
+		readVol=read_value_from_fd(fd_vol, 0);
+		if (readVol>4090){
+			readVol=4090;
+		}
+		
+		readVol=(4090-readVol*63)/4090;
+		volcheckcounter=0;
 	}
 	
 	if (readVol!= prev_readVol){
