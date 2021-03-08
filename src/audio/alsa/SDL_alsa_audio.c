@@ -24,6 +24,7 @@
 #define VOLCHECKCOUNT 60
 
 int volcheckcounter=VOLCHECKCOUNT;
+int readVol=0;
 int prev_readVol=0;
 
 #include "SDL_config.h"
@@ -353,8 +354,6 @@ static void ALSA_PlayAudio(_THIS)
 	const Uint8 *sample_buf = (const Uint8 *) mixbuf;
 	const int frame_size = (((int) (this->spec.format & 0xFF)) / 8) * this->spec.channels;
 
-	int readVol=0;
-	int amixerStatus=0;
     char buf[64];
 	
 	
@@ -384,7 +383,7 @@ static void ALSA_PlayAudio(_THIS)
 	volcheckcounter=0;
 	}
 	
-	if (readVol>0 &&  readVol!= prev_readVol){
+	if (readVol!= prev_readVol){
 		prev_readVol=readVol;
 		*(unsigned long *)buf = 0;
 				*(unsigned long *)&buf[4] = 0;
@@ -395,7 +394,7 @@ static void ALSA_PlayAudio(_THIS)
 			  
 			  
 		//set volume with amixer
-		amixerStatus = system(buf);
+		system(buf);
 	}
 	
 		status = SDL_NAME(snd_pcm_writei)(pcm_handle, sample_buf, frames_left);
