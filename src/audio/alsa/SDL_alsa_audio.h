@@ -38,14 +38,14 @@ struct SDL_PrivateAudioData {
 
 	/* Raw mixing buffer */
 	Uint8 *mixbuf;
-	Uint8 *volbuf;
+	//Uint8 *volbuf;
 	int    mixlen;
 };
 
 /* Old variable names */
 #define pcm_handle		(this->hidden->pcm_handle)
 #define mixbuf			(this->hidden->mixbuf)
-#define volbuf			(this->hidden->volbuf)
+//#define volbuf			(this->hidden->volbuf)
 #define mixlen			(this->hidden->mixlen)
 
 #endif /* _ALSA_PCM_audio_h */

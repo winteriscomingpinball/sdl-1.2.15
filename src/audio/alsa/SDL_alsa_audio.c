@@ -26,6 +26,7 @@
 #include <sys/types.h>
 #include <signal.h>	/* For kill() */
 #include <fcntl.h>
+#include <stdlib.h>
 
 
 
@@ -342,16 +343,12 @@ static void ALSA_PlayAudio(_THIS)
 {
 	int status;
 	snd_pcm_uframes_t frames_left;
-	const Uint8 *src_buf = (const Uint8 *) mixbuf;
-	Uint8 *sample_buf = (const Uint8 *) volbuf;
+	const Uint8 *sample_buf = (const Uint8 *) mixbuf;
 	const int frame_size = (((int) (this->spec.format & 0xFF)) / 8) * this->spec.channels;
-    const Uint8 *src = (const Uint8 *) mixbuf;
-	Uint8 *dst = (Uint8 *) volbuf;
+
 	int readVol;
-	unsigned vol;
-	int temp;
-	int counter;
-	
+	int amixerStatus=0;
+
 	
 	swizzle_alsa_channels(this);
 
@@ -365,43 +362,17 @@ static void ALSA_PlayAudio(_THIS)
 	
 
     //readVol=(4090-read_value_from_fd(fd_vol, 0))*16;
-	readVol=((4090-read_value_from_fd(fd_vol, 0))*128)/4090;
 	
-	//readVol=read_value_from_fd(fd_vol, 0)*0.015;
-	//readVol=read_value_from_fd(fd_vol, 0)/4090
 	
-	//vol=readVol>>3;
-	 //vol=0;
-
-	// if (readVol&0x01)
-	// {
-		// vol++;
-		// //for odd volume step - add back in half as much again!
-		// for(counter=frames_left;counter;counter--)
-		// {
-			// temp=(*src++)>>vol;
-			// *dst++=temp+(temp>>1);
-		// }
-	// }
-	// else
-	// {
-		// //For even volume step - same as normal shift
-		// for(counter=frames_left;counter;counter--)
-		// {
-			// *dst++=(*src++)>>vol;
-		// }
-	// }
+	//get value from volume wheel and convert to a value 0-63
+	readVol=((4090-read_value_from_fd(fd_vol, 0))*63)/4090;
 	
-	SDL_memset(sample_buf, 0, this->spec.size);
+	//set volume with amixer
+	amixerStatus = system( sprintf("amixer set 'head phone volume' %d",readVol));
 	
-	SDL_MixAudio (sample_buf, src_buf, this->spec.size, readVol);
 	
-	//for(counter=frames_left;counter;counter--)
-	//	 {
-	//		 sample_buf[counter]-=sample_buf[counter]* readVol;
-	//		 sample_buf[counter]-=sample_buf[counter];//* readVol;
-	 //   }
-		
+	//amixer set 'head phone volume' 65
+	
 
 		status = SDL_NAME(snd_pcm_writei)(pcm_handle, sample_buf, frames_left);
 		if ( status < 0 ) {
@@ -695,7 +666,7 @@ static int ALSA_OpenAudio(_THIS, SDL_AudioSpec *spec)
 	/* Allocate mixing buffer */
 	mixlen = spec->size;
 	mixbuf = (Uint8 *)SDL_AllocAudioMem(mixlen);
-	volbuf = (Uint8 *)SDL_AllocAudioMem(mixlen);
+	//volbuf = (Uint8 *)SDL_AllocAudioMem(mixlen);
 	if ( mixbuf == NULL ) {
 		ALSA_CloseAudio(this);
 		return(-1);
