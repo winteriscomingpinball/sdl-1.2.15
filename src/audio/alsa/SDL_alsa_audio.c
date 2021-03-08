@@ -372,26 +372,26 @@ static void ALSA_PlayAudio(_THIS)
     //readVol=(4090-read_value_from_fd(fd_vol, 0))*16;
 	
 	
-	//get value from volume wheel and convert to a value 0-63
-	volcheckcounter++;
-	if(volcheckcounter>=VOLCHECKCOUNT){	
-	readVol=((4090-read_value_from_fd(fd_vol, 0))*63)/4090;
-	volcheckcounter=0;
-	}
+	// //get value from volume wheel and convert to a value 0-63
+	// volcheckcounter++;
+	// if(volcheckcounter>=VOLCHECKCOUNT){	
+	// readVol=((4090-read_value_from_fd(fd_vol, 0))*63)/4090;
+	// volcheckcounter=0;
+	// }
 	
-	if (readVol>0 &&  readVol!= prev_readVol){
-		prev_readVol=readVol;
-		*(unsigned long *)buf = 0;
-				*(unsigned long *)&buf[4] = 0;
-				*(unsigned long *)&buf[8] = 0;
-				*(unsigned long *)&buf[12] = 0;
-				*(unsigned long *)&buf[16] = 0;
-			  sprintf(buf, "amixer set 'head phone volume' %d", readVol);
+	// if (readVol>0 &&  readVol!= prev_readVol){
+		// prev_readVol=readVol;
+		// *(unsigned long *)buf = 0;
+				// *(unsigned long *)&buf[4] = 0;
+				// *(unsigned long *)&buf[8] = 0;
+				// *(unsigned long *)&buf[12] = 0;
+				// *(unsigned long *)&buf[16] = 0;
+			  // sprintf(buf, "amixer set 'head phone volume' %d", readVol);
 			  
 			  
-		//set volume with amixer
-		amixerStatus = system(buf);
-	}
+		// //set volume with amixer
+		// amixerStatus = system(buf);
+	// }
 	
 		status = SDL_NAME(snd_pcm_writei)(pcm_handle, sample_buf, frames_left);
 		if ( status < 0 ) {
