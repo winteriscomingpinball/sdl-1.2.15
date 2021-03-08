@@ -33,6 +33,7 @@
 
 //use this to be able to open file for screen updates
 #include <fcntl.h>
+#include <stdlib.h>
 
 int fd_lcd;
 
