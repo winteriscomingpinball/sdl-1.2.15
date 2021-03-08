@@ -21,7 +21,7 @@
 */
 
 
-#define VOLCHECKCOUNT 50
+#define VOLCHECKCOUNT 200
 
 int volcheckcounter=0;
 int prev_readVol=0;
@@ -379,7 +379,7 @@ static void ALSA_PlayAudio(_THIS)
 	volcheckcounter=0;
 	}
 	
-	if (readVol != prev_readVol){
+	if (readVol>0 &&  readVol!= prev_readVol){
 		prev_readVol=readVol;
 		*(unsigned long *)buf = 0;
 				*(unsigned long *)&buf[4] = 0;
