@@ -379,7 +379,7 @@ static void ALSA_PlayAudio(_THIS)
 			readVol=4090;
 		}
 		
-		readVol=(4090-readVol*63)/4090;
+		readVol=((4090-readVol)*63)/4090;
 		volcheckcounter=0;
 	}
 	
