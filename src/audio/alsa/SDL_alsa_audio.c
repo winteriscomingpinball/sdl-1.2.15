@@ -551,6 +551,11 @@ static int ALSA_OpenAudio(_THIS, SDL_AudioSpec *spec)
 	unsigned int 	     channels;
 	Uint16               test_format;
 	
+	
+	//set volume to 0 before starting pcm
+	system("amixer set 'head phone volume' 0 >/dev/null 2>&1 &");
+	
+	
 	//for volume wheel val
 	fd_vol = open("/sys/devices/soc/1c24800.tp_adc/value", 0);
 
