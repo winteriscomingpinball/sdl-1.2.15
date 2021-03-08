@@ -21,7 +21,7 @@
 */
 
 
-#define VOLCHECKCOUNT 1000
+#define VOLCHECKCOUNT 5000
 
 int volcheckcounter=0;
 int prev_readVol=0;
