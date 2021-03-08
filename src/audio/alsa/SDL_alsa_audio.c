@@ -348,7 +348,8 @@ static void ALSA_PlayAudio(_THIS)
 
 	int readVol;
 	int amixerStatus=0;
-
+    char buf[64];
+	
 	
 	swizzle_alsa_channels(this);
 
@@ -367,11 +368,17 @@ static void ALSA_PlayAudio(_THIS)
 	//get value from volume wheel and convert to a value 0-63
 	readVol=((4090-read_value_from_fd(fd_vol, 0))*63)/4090;
 	
+	
+	*(unsigned long *)buf = 0;
+			*(unsigned long *)&buf[4] = 0;
+			*(unsigned long *)&buf[8] = 0;
+			*(unsigned long *)&buf[12] = 0;
+			*(unsigned long *)&buf[16] = 0;
+		  sprintf(buf, "amixer set 'head phone volume' %d", readVol);
+		  
+		  
 	//set volume with amixer
-	amixerStatus = system( sprintf("amixer set 'head phone volume' %d",readVol));
-	
-	
-	//amixer set 'head phone volume' 65
+	amixerStatus = system(buf);
 	
 
 		status = SDL_NAME(snd_pcm_writei)(pcm_handle, sample_buf, frames_left);
