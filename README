@@ -35,7 +35,7 @@ make
 Install:
 make install
 
-The compiled library will be contained in the lib directory in your install destination specified with prefix above.  A pre-compiled version of it is avaialble in this repository.  Volume control is not yet integrated.
+The compiled library will be contained in the lib directory in your install destination specified with prefix above.  A pre-compiled version of it is avaialble in this repository.  Volume control is integrated and requires amixer, which can be found compiled here: https://github.com/winteriscomingpinball/amixer-alsa-utils-0.9.0rc4
 
 
 
